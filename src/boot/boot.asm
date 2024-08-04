@@ -1,8 +1,8 @@
 ORG 0x7c00
 BITS 16
 
-code_segment_selector equ gdt_code-gdt_start
-data_segment_selector equ gdt_data-gdt_start
+CODE_SEGMENT_SELECTOR equ gdt_code-gdt_start
+DATA_SEGMENT_SELECTOR equ gdt_data-gdt_start
 
 jmp short start
 nop
@@ -42,7 +42,8 @@ step1:
     mov ss,ax
     sti
 
-gdt_start:
+;GDT
+gdt_start:       ;Various Segment Descriptors.
 gdt_null:
     dd 0
     dd 0
@@ -71,7 +72,7 @@ gdt_description:
     mov eax,cr0
     or eax,1
     mov cr0,eax
-    jmp code_segment_selector:load32
+    jmp CODE_SEGMENT_SELECTOR:load32
 
  [BITS 32]
  load32:
@@ -79,7 +80,7 @@ gdt_description:
     mov ecx, 100
     mov edi, 0x0100000
     call ata_lba_read
-    jmp code_segment_selector:0x0100000
+    jmp CODE_SEGMENT_SELECTOR:0x0100000
 
 ata_lba_read:
     mov ebx, eax, ; Backup the LBA
