@@ -2,7 +2,7 @@
 #define GDT_H
 
 #include <stdint.h>
-#include "../../config.h"
+#include "../config.h"
 
 struct gdt{
     uint16_t limit_first_word;

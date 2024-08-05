@@ -1,0 +1,11 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define GDT_TOTAL_ENTRIES 6
+
+#define HEAP_SIZE 104857600
+#define HEAP_BLOCK_SIZE 4096
+#define HEAP_TABLE_ADDRESS 0x00007e00
+#define HEAP_ADDRESS 0x01000000
+
+#endif

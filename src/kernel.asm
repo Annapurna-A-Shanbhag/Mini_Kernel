@@ -9,7 +9,6 @@ DATA_SEGMENT_SELECTOR equ 0x10
 
 ;Initialzation
 _start:
-    cli
     mov ax,DATA_SEGMENT_SELECTOR
     mov ds,ax
     mov es,ax
@@ -18,7 +17,6 @@ _start:
     mov ss,ax
     mov ebp,0x0200000
     mov esp,ebp
-    sti
 
 ;Enable A20 line
     in al,0x92
