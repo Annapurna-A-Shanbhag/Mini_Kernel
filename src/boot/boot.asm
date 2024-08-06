@@ -40,7 +40,16 @@ step1:
     mov ds,ax
     mov es,ax
     mov ss,ax
+    mov sp,0x7c00
     sti
+
+.loadGDT:
+    cli
+    lgdt[gdt_description]
+    mov eax,cr0
+    or eax,1
+    mov cr0,eax
+    jmp CODE_SEGMENT_SELECTOR:load32
 
 ;GDT
 gdt_start:       ;Various Segment Descriptors.
@@ -66,13 +75,7 @@ gdt_description:
     dw gdt_end-gdt_start-1
     dd gdt_start
 
-.loadGDT:
-    cli
-    lgdt[gdt_description]
-    mov eax,cr0
-    or eax,1
-    mov cr0,eax
-    jmp CODE_SEGMENT_SELECTOR:load32
+
 
  [BITS 32]
  load32:
@@ -140,9 +143,5 @@ ata_lba_read:
     loop .next_sector
     ; End of reading sectors into memory
     ret
-
 times 510-($ -$$) db 0
 dw 0xAA55
-
-
-    

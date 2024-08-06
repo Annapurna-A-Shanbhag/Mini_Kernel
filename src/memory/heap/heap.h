@@ -1,6 +1,7 @@
 #ifndef HEAP_H
 #define HEAP_H
-#include<stdint.h>
+#include <stdint.h>
+#include <stddef.h>
 #include "../../config.h"
 #include "../memory.h"
 #include "../../kernel.h"
@@ -13,7 +14,7 @@
 typedef unsigned char HEAP_BLOCK_TABLE_ENTRY;
 
 struct heap_table{
-    int table_size;
+    size_t table_size;
     HEAP_BLOCK_TABLE_ENTRY* table_entry;
     
 
@@ -24,8 +25,8 @@ struct heap{
 };
 
 
-void heap_initialization();
-void* heap_malloc(struct heap *heap,int size);
+void heap_initialization(struct heap *heap,struct heap_table *table,void* end_addr,size_t total);
+void* heap_malloc(struct heap *heap,size_t size);
 void  heap_free(struct heap *heap,void * ptr);
 
 #endif

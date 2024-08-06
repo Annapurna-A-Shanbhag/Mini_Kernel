@@ -1,5 +1,6 @@
 #ifndef MEMORY_H
 #define MEMORY_H
-void memnset(void *ptr,int c,int size);
+#include <stddef.h>
+void memnset(void *ptr,int c,size_t size);
 
 #endif

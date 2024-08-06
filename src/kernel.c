@@ -47,16 +47,16 @@ void terminal_initialize()
 
 void print(const char* str)
 {
-   // size_t len = strlen(str);
-    /*for (int i = 0; i < len; i++)
+   size_t len = strlen(str);
+   for (int i = 0; i < len; i++)
     {
         terminal_writechar(str[i], 15);
-    } */
-    terminal_writechar('A', 3);
+    } 
+    
 }
 
 
-/*struct tss tss;
+struct tss tss;
 struct gdt gdt[GDT_TOTAL_ENTRIES];
 struct gdt_structure gdt_structure[GDT_TOTAL_ENTRIES]={
     {.base=0x00,.limit=0x00,.type=0x00},                   //NULL
@@ -66,21 +66,23 @@ struct gdt_structure gdt_structure[GDT_TOTAL_ENTRIES]={
     {.base=0x00,.limit=0xffffffff,.type=0xf2},             //User_DATA
     {.base=(uint32_t)&tss,.limit=sizeof(tss),.type=0xe9}   //Tss
 
-}; */
+}; 
 void kernel_main(){
 
 
-    //terminal_initialize();
-    //terminal_writechar('A', 15);
-    //print("HELLO WORLD\n");
-    /*memnset(gdt,0,sizeof(gdt));
+    terminal_initialize();
+    print("HELLO WORLD\n");
+    memnset(gdt,0,sizeof(gdt));
     gdt_initialize(gdt,gdt_structure);
     gdt_load(sizeof(gdt),gdt);
-    kheap_initialization(); */
+    kheap_initialization();
+    void* addr=kzalloc(4098);
+    if(!addr)
+       return;
+    kfree(addr);
+    
 
-    uint16_t* video_mem=(uint16_t*)(0xB8000);
-    video_mem[0]='A';
-    video_mem[1]=3;
+    
     
 
 }
