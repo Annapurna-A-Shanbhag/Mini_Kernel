@@ -10,6 +10,7 @@
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
 #include "string/string.h"
+#include "memory/paging/paging.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
