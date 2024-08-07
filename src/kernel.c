@@ -75,6 +75,7 @@ void kernel_main(){
     memnset(gdt,0,sizeof(gdt));
     gdt_initialize(gdt,gdt_structure);
     gdt_load(sizeof(gdt),gdt);
+    idt_initialization();
     kheap_initialization();
     struct paging_4gb_chunk *chunk=paging_new_4gb(PAGING_IS_PREENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
     paging_switch(chunk);
