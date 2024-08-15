@@ -12,11 +12,15 @@
 #include "string/string.h"
 #include "memory/paging/paging.h"
 #include "idt/idt.h"
+#include "./fs/file.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
 
+#define ERROR(value) (void*)(value);
+
 void kernel_main();
-void print(const char* str);
+void print(char* str);
+
 
 #endif

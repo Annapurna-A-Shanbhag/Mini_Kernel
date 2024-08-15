@@ -16,4 +16,13 @@
 
 #define TOTAL_NO_INTERRUPTS 512
 
+#define NUMBER_OF_FILESYTEMS 12
+#define NUMBER_OF_FILE_DESCRIPTORS 512
+#define SECTOR_SIZE 512   //In bytes
+
+#define PATH_NAME_LIMIT 20
+#define PATH_LIMIT 20
+
+
+
 #endif
