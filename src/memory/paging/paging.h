@@ -22,5 +22,7 @@ struct paging_4gb_chunk * paging_new_4gb(uint8_t flags);
 void paging_switch(struct paging_4gb_chunk *chunk);
 void enable_paging();
 void load_page();
+void* paging_align_address(void *addr);
+int paging_map_to(struct paing_4gb_chunk *chunk,void*phy,void*virt,void* end,uint8_t flags);
 
 #endif
