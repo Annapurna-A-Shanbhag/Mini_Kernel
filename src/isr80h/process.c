@@ -27,7 +27,6 @@ void* isr80h_command6_process_load_start(struct interrupt_frame* frame)
 out:
     return 0;
 }
-
 void isr80h_command7_invoke_system_command(struct interrupt_frame *frame){
    int res=0;
    struct command_arguments *arguments=convert_virt_to_phy(task_current_task(),task_get_stack_item(task_current_task(),0));
@@ -52,6 +51,5 @@ void isr80h_command7_invoke_system_command(struct interrupt_frame *frame){
    task_switch(process->task);
    //task_return(&process->task->registers);
 
-
-
 }
+
