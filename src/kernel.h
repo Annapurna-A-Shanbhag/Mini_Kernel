@@ -21,6 +21,7 @@
 
 void kernel_main();
 void print(char* str);
+void kerenl_registers();
 
 
 #endif

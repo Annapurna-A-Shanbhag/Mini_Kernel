@@ -66,7 +66,15 @@ struct gdt_structure gdt_structure[GDT_TOTAL_ENTRIES]={
     {.base=0x00,.limit=0xffffffff,.type=0xf2},             //User_DATA
     {.base=(uint32_t)&tss,.limit=sizeof(tss),.type=0xe9}   //Tss
 
-}; 
+};
+
+static struct paging_4gb_chunk* kernel_chunk = 0;
+
+void kernel_page()
+{
+    kernel_registers();
+    paging_switch(kernel_chunk);
+}
 void kernel_main(){
 
 

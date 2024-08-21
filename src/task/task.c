@@ -4,6 +4,54 @@ struct task *task_head=0;
 struct task *task_tail=0;
 struct task *current_task=0;
 
+struct task *task task_current_task(){
+    return current_task;
+}
+void task_page_task(struct task *task){
+    user_registers();
+    page_switch(task->chunk);
+}
+
+void* task_get_stack_item(struct task *task,int top){
+    void* result=0;
+    uint32_t *sp_ptr=task->registers.esp;
+    task_page_task(task);
+    result=sp_ptr[top];
+    rkernel_page();
+    return result;
+}
+
+int copy_string_from_task(struct task *task,void *virt, void*phy,uint32_t size)
+{
+    int res=0;
+    if(size>PAGE_SIZE){
+        res-EINVARG;
+        goto out;
+    }
+    void *tmp=kzalloc(sizeof(size));
+    if(!tmp){
+        res-ENOMEM;
+        goto out;
+    }
+    int old_value=page_get(task->chunk,tmp);
+    if(old_value<0){
+        goto out;
+    }
+    task_page_task(task);
+    paging_map_to(task->chunk,tmp,tmp,size,PAGING_IS_PREENT|PAGING_IS_WRITABLE|PAGING_ACCESS_FROM_ALL);
+    str_n_cpy(tmp,virt,size);
+    kernel_page();
+    res=paging_set(task->chunk->directory_entry,tmp,old_value);
+    if(res<0){
+        res=-EIO;
+        goto out;
+    }
+    str_n_cpy(phy,tmp,size);
+
+
+out:return res;
+}
+
 int task_initialization(struct task *task,struct process *process){
     task->chunk=paging_new_4gb(PAGING_IS_PREENT|PAGING_IS_WRITABLE|PAGING_ACCESS_FROM_ALL);
     if(!task->chunk){

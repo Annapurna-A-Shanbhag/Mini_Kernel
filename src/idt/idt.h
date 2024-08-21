@@ -7,6 +7,9 @@
 #include "../memory/memory.h"
 #include "../kernel.h"
 
+struct interrupt_frame;
+typedef void*(*ISR80H_COMMAND)(struct interrupt_frame* frame);
+
 struct idt_desc{
     uint16_t offset_first;
     uint16_t segment_selector;

@@ -29,5 +29,10 @@ struct task{
     struct paging_4gb_chunk *chunk;
 };
 
+void user_registers();
+void* task_get_stack_item(struct task *task,int top);
+int copy_string_from_task(struct task *task,void *virt, void*phy,uint32_t size);
+struct task *task task_current_task();
+
 
 #endif

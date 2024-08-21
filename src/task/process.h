@@ -19,6 +19,17 @@ struct process_allocation{
     uint32_t size;
 };
 
+struct command_arguments{
+    char argument[512];
+    struct current_arguments* next;
+};
+
+
+struct process_arguments{
+    int argc;
+    char **argv;
+};
+
 struct process{
     int pid;
     void *phy_addr;
@@ -28,8 +39,12 @@ struct process{
     PROCESS_FILETYPE filetype;
     uint32_t size;
     struct process_allocation allocations[NUMBER_OF_PROCESS_ALLOCATION];
+    struct process_arguments arguments;
 };
 
+int process_malloc(struct process *process,size_t size);
+int process_load_switch(char *filename,struct process** process);
+int process_free(struct process *process,void* ptr);
 
 
 

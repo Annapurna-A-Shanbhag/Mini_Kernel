@@ -3,6 +3,7 @@
 
 struct idt_desc idt[TOTAL_NO_INTERRUPTS];
 struct idt_desc_table idtr;
+static ISR80H_COMMAND isr80h_commands[NUMBER_OF_ISR80H_COMMANDS];
 void initial(){
     print("IDT Initialization\n");
 }
@@ -14,6 +15,16 @@ void idt_set(int index){
     idt[index].type_attribute=0xEE;
     idt[index].offset_second=((uint32_t)initial)>>16;
     
+}
+
+void isr80_register_command(int command_no,ISR80H_COMMAND command){
+    if(command_no<=0 || command_no>NUMBER_OF_ISR80H_COMMANDS){
+        return;
+    }
+    if(isr80h_commands[command_no]){
+        return;
+    }
+    isr80h_commands[command_no]=command;
 }
 
 void idt_initialization(){

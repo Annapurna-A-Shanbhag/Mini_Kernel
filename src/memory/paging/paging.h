@@ -24,5 +24,7 @@ void enable_paging();
 void load_page();
 void* paging_align_address(void *addr);
 int paging_map_to(struct paing_4gb_chunk *chunk,void*phy,void*virt,void* end,uint8_t flags);
+uint32_t page_get(struct paging_4gb_chunk *chunk,void *virt);
+int paging_set(uint32_t * directory,uint32_t virt,uint32_t value);
 
 #endif

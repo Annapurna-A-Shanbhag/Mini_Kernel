@@ -3,12 +3,118 @@
 struct process *current_process;
 struct process *processes[NUMBER_OF_TOTAL_PROCESSES]={};
 
+int process_get_number_of_arguments(struct command_arguments *root_argument){
+    struct command_arguments *current=root_argument;
+    int count=0;
+    while(current){
+        current=current->next;
+        count++;
+    }
+    return count;
+
+}
+
+int process_inject_arguments(struct process *process,struct command_arguments *root_argument){
+    int res=0;
+    int argc=process_get_number_of_arguments(root_argument);
+    if(argc==0){
+        res=-EINVARG;
+        goto out;
+
+    }
+    char **argv=process_malloc(process,argc*sizeof(char *));
+    struct command_arguments *current=root_argument;
+    int i=0;
+    while(current){
+        char *arg=process_malloc(process,sizeof(current->argument));
+        str_n_cpy(arg,current->argument,sizeof(current->argument));
+        argv[i]=arg;
+        current=current->next;
+        i++;
+
+   }
+   process->arguments.argc=argc;
+   process->arguments.argv=argv;
+out: return res;  
+}
+
 struct process * process_get_process_by_id(uint16_t process_slot) {
     if(process_slot<0 || process_slot>=NUMBER_OF_TOTAL_PROCESSES){
         return -EINVARG;
     }
   
     return processes[process_slot];
+}
+
+struct process_allocation *process_get_alloc_index(struct process *process){
+    for(int i=0;i<NUMBER_OF_PROCESS_ALLOCATION;i++){
+        if(process->allocations[i].addr==0){
+            return &process->allocations[i];
+        }
+    }
+    return 0;
+}
+
+
+int process_malloc(struct process *process,size_t size){
+    int res=0;
+    struct process_allocation *allocation=process_get_free_alloc_index(process);
+    if(allocation==0){
+        res=-ENOMEM;
+        goto out;
+    }
+    void *phy=kzalloc(sizeof(size));
+    if(!phy){
+        res=-ENOMEM;
+        goto out;
+    }
+    res=paging_map_to(process->task->chunk,phy,phy,paging_align_address((uint32_t)phy+size),PAGING_IS_PREENT|PAGING_IS_WRITABLE|PAGING_ACCESS_FROM_ALL);
+    if(res<0){
+        res=-EIO;
+        goto out;
+    }
+    allocation->addr=phy;
+    allocation->size=size;
+
+out:if(res<0){
+      kfree(phy);
+    }
+    return res;
+
+}
+
+struct process_allocation * process_get_alloc_by_addr(struct process *process,void* ptr){
+    for(int i=0;i<NUMBER_OF_PROCESS_ALLOCATION;i++){
+        if(process->allocations[i].addr==ptr){
+            return &process->allocations[i];
+        }
+    }
+    return -EIO;
+
+}
+
+void process_allocation_unjoin(struct process_allocation *allocation){
+    allocation->addr=0;
+    allocation->size=0;
+
+}
+
+int process_free(struct process *process,void* ptr){
+    int res=0;
+    struct process_allocation * allocation=process_get_alloc_by_addr(process,ptr);
+    if(!allocation){
+        res=-EIO;
+        goto out;
+    }
+    res=paging_map_to(process->task->chunk,ptr,ptr,paging_align_address((uint32_t)allocation->addr+allocation->size),000);
+    if(res<0){
+        res-EIO;
+        goto out;
+    }
+    process_allocation_unjoin(allocation);
+    kfree(ptr);
+
+out:return res;
 }
 
 int process_map_binary(struct process *process){
@@ -118,4 +224,4 @@ int process_load(char *filename,struct process **process){
 
 int process_load_switch(char *filename,struct process** process){
     process_load(filename,process);
-}
+    }

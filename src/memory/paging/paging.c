@@ -99,3 +99,16 @@ int paging_map_to(struct paing_4gb_chunk *chunk,void*phy,void*virt,void* end,uin
 out:return res;
 }
 
+
+uint32_t page_get(struct paging_4gb_chunk *chunk,void *virt){
+    uint32_t directory_index;
+    uint32_t table_index;
+    uint32_t *directory=chunk->directory_entry;
+    paging_get_indexes(directory,&directory_index,&table_index);
+    void *entry=directory[directory_index];
+    uint32_t *table_address=(uint32_t)entry & 0xfffff000;
+    int value=table_address[table_index];
+    return value;
+    
+}
+
