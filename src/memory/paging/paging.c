@@ -27,6 +27,17 @@ void paging_switch(struct paging_4gb_chunk *chunk){
 
 }
 
+void paging_free_4gb_chunk(struct paging_4gb_chunk *chunk){
+    uint32_t *directory=chunk->directory_entry;
+    for(int i=0;i<PAGE_DIRECTORY_ENTRIES;i++){
+        uint32_t entry=directory_entry[i];
+        uint32_t *table=(uint32_t *)(entry| oxfffff000);
+        kfree(table);
+    }
+    kfree(directory);
+    kfree(chunk);
+}
+
 void* paging_align_address(void *addr){
     if((uint32_t)addr%PAGE_SIZE==0){
         return addr;
@@ -110,5 +121,19 @@ uint32_t page_get(struct paging_4gb_chunk *chunk,void *virt){
     int value=table_address[table_index];
     return value;
     
+}
+
+void * paging_align_to_lower(void *virt){
+    uint32_t addr=(uint32_t)virt+PAGE_SIZE;
+    uint32_t addr=a-(addr%PAGE_SIZE);
+    return (void *)addr;
+}
+
+void * paging_convert_virt_to_phy(struct task *task, void * virt){
+    struct paging_4gb_chunk *chunk=task->chunk;
+    void * addr=paging_align_address(virt);
+    uint32_t difference=(uint32_t)virt-(uint32_t)addr;
+    void * entry=(void *)((page_get(chunk,virt)&0xfffff000)+difference);
+
 }
 

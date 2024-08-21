@@ -45,7 +45,7 @@ struct process{
 int process_malloc(struct process *process,size_t size);
 int process_load_switch(char *filename,struct process** process);
 int process_free(struct process *process,void* ptr);
-
+void process_get_arguments(struct process *process,int *argc, char ***argv);
 
 
 #endif

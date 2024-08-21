@@ -2,6 +2,14 @@
 
 struct process *current_process;
 struct process *processes[NUMBER_OF_TOTAL_PROCESSES]={};
+struct process *current_process=0;
+
+void process_get_arguments(struct process *process,int *argc, char ***argv){
+
+    argc=process->arguments.argc;
+    argv=process->arguments.argv;
+
+}
 
 int process_get_number_of_arguments(struct command_arguments *root_argument){
     struct command_arguments *current=root_argument;
@@ -117,6 +125,50 @@ int process_free(struct process *process,void* ptr){
 out:return res;
 }
 
+void process_switch(struct process *process){
+    current_process=process;
+}
+
+void process_switch_to_any(){
+    for(int i=0;i<NUMBER_OF_TOTAL_PROCESSES;i++){
+        if(processes[i]){
+            process_switch(process[i]);
+        }
+    }
+}
+
+void process_unlink(struct process *process){
+    processes[process->pid]=0x00;
+    if(current_process==process){
+        process_switch_to_any();
+    }
+
+}
+
+int process_free_allocations(struct process *process){
+    for(int i=0;i<NUMBER_OF_PROCESS_ALLOCATION;i++){
+      process_free(process,process->allocations[i].ptr);
+    }
+    return 0;
+}
+
+void process_free_binary_data(struct process *process){
+    kfree(process->phy_addr);
+}
+
+void process_free_program_data(struct process *process){
+    process_free_binary_data(process);
+}
+
+int process_terminate(struct process *process){
+    int res=0;
+    res=process_free_allocations(process);
+    process_free_program_data(process);
+    kfree(process->stack_phy_address);
+    task_free(process->task);
+    process_unlink(process);
+}
+
 int process_map_binary(struct process *process){
     return paging_map_to(process->task->chunk,process->phy_addr,(void*)PROGRAM_VIRTUAL_ADDRESS,paging_align_address(process->phy_addr+process->size),PAGING_IS_PREENT|PAGING_IS_WRITABLE|PAGING_ACCESS_FROM_ALL);
 }
@@ -224,4 +276,4 @@ int process_load(char *filename,struct process **process){
 
 int process_load_switch(char *filename,struct process** process){
     process_load(filename,process);
-    }
+ }

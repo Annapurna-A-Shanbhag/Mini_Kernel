@@ -29,7 +29,7 @@ out:
 }
 void isr80h_command7_invoke_system_command(struct interrupt_frame *frame){
    int res=0;
-   struct command_arguments *arguments=convert_virt_to_phy(task_current_task(),task_get_stack_item(task_current_task(),0));
+   struct command_arguments *arguments=paging_convert_virt_to_phy(task_current_task(),task_get_stack_item(task_current_task(),0));
    if(!arguments  || str_len(arguments->argument)<=0){
     return;
 
@@ -53,3 +53,18 @@ void isr80h_command7_invoke_system_command(struct interrupt_frame *frame){
 
 }
 
+void isr80h_command8_get_program_arguments(struct interrupt_frame *frame){
+   
+   struct process *process=task_current_task()->process;
+   struct process_arguments *arguments=paging_convert_virt_to_phy(task_current_task(),task_get_stack_item(task_current_task(),0));
+   process_get_arguments(process,&arguments->argc,&arguments->argv);
+   return 0;
+
+}
+
+void *isr80h_command9_exit(struct interrupt_frame *frame){
+    struct process *process=task_current_task()->process;
+    process_terminate(process);
+    return;
+
+}

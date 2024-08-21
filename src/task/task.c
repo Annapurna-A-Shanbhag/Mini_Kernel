@@ -12,6 +12,38 @@ void task_page_task(struct task *task){
     page_switch(task->chunk);
 }
 
+struct task *task task_get_next(){
+    if(!current_task->next){
+        return task_head;
+    }
+    return current_task->next;
+}
+
+void task_list_remove(struct task *task){
+    if(task->prev){
+        task->prev->next=task->next;
+    }
+    
+    if(task_head==task){
+        task_head=task->next;
+    }
+
+    if(task_tail==task){
+        task_tail=task->prev;
+    }
+
+    if(task==current_task){
+        current_task=task_get_next();
+    }
+
+}
+
+void task_free(struct task *task){
+    paging_free_4gb_chunk(task->chunk);
+    task_list_remove(task);
+    kfree(task);
+}
+
 void* task_get_stack_item(struct task *task,int top){
     void* result=0;
     uint32_t *sp_ptr=task->registers.esp;
