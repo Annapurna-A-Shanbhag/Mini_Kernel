@@ -44,6 +44,25 @@ void task_free(struct task *task){
     kfree(task);
 }
 
+int task_switch(struct task *task)
+{
+    current_task = task;
+    paging_switch(task->page_directory);
+    return 0;
+}
+
+void task_next()
+{
+    struct task* next_task = task_get_next();
+    if (!next_task)
+    {
+    }
+
+    task_switch(next_task);
+    task_return(&next_task->registers);
+}
+
+
 void* task_get_stack_item(struct task *task,int top){
     void* result=0;
     uint32_t *sp_ptr=task->registers.esp;
