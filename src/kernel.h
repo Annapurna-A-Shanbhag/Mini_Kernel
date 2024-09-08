@@ -13,15 +13,18 @@
 #include "memory/paging/paging.h"
 #include "idt/idt.h"
 #include "./fs/file.h"
+#include "./isr80h/isr80h.h"
+#include "./keyboard/keyboard.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
 
-#define ERROR(value) (void*)(value);
+#define ERROR(value) (void *)(value)
+#define ERROR_I(value) (int)(value)
+#define ISERR(value) ((int)value < 0)
 
 void kernel_main();
-void print(char* str);
+void print(char *str);
 void kerenl_registers();
-
 
 #endif

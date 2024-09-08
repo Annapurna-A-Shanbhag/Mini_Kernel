@@ -105,7 +105,7 @@ struct filesystem *fs_resolve(struct disk *disk)
     return f_system;
 }
 
-int fopen(struct disk *disk, char *file_name, char *str_mode)
+int fopen(char *file_name, char *str_mode)
 {
     int res = 0;
     FILE_MODE mode = file_get_mode_by_string(str_mode);
@@ -114,7 +114,7 @@ int fopen(struct disk *disk, char *file_name, char *str_mode)
         res = -EINVARG;
         goto out;
     }
-    struct root_path *root = path_parser(disk, file_name);
+    struct root_path *root = path_parser(file_name);
     if (!root)
     {
         res = -EINVARG;
@@ -125,13 +125,13 @@ int fopen(struct disk *disk, char *file_name, char *str_mode)
         res = -EINVARG;
         goto out;
     }
-    struct disk *idisk = disk_get(root->disk_id);
-    if (!idisk)
+    struct disk *disk = disk_get(root->disk_id);
+    if (!disk)
     {
         res = -EIO;
         goto out;
     }
-    if (idisk != disk)
+    if (!disk->f_system)
     {
         res = -EIO;
         goto out;
@@ -217,7 +217,7 @@ int fclose(int fd)
 {
     int res = 0;
     struct filesystem_desc *desc = 0;
-    desc = fs_get_fs_descriptor(fd);
+    desc = fs_get_fs_descriptor(fd); // pathparser_free??
     if (!desc)
     {
         res = -EINVARG;

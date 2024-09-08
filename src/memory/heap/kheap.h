@@ -3,7 +3,7 @@
 #include "heap.h"
 
 void kheap_initialization();
-void* kzalloc(size_t size);
-void kfree(void* ptr);
+void *kzalloc(size_t size);
+int kfree(void *ptr);
 
 #endif

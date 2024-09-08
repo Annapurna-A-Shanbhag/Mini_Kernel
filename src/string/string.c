@@ -1,28 +1,43 @@
 #include "string.h"
 
-int str_len(char* str){
-    int i=0;
-    char c=*(str+i);
-    while(c!='\n'){
-      i++;
-      c=*(str+i);
-    }
-    return i;
-}
-
-void str_n_cpy(char* dest,char* src, size_t n ){
-  for(int i=0;i<n;i++){
-    *(dest+i)=*(src+i);
+int str_len(char *str)
+{ // We can simplify this
+  int i = 0;
+  char c = *(str + i);
+  while (c != '\n')
+  {
+    i++;
+    c = *(str + i);
   }
-  dest[n]='\n';
-
+  return i;
 }
 
-int str_n_cmp(char *str1,char *str2, size_t n){
-  for(int i=0;i<n;i++){
-    if(*(str1+i)!=*(str2+i)){
+void str_n_cpy(char *dest, char *src, size_t n)
+{
+  for (int i = 0; i < n; i++)
+  {
+    *(dest + i) = *(src + i);
+  }
+  dest[n] = '\n';
+}
+
+int str_n_cmp(char *str1, char *str2, size_t n)
+{
+  for (int i = 0; i < n; i++)
+  {
+    if (*(str1 + i) != *(str2 + i))
+    {
       return -1;
     }
   }
   return 0;
+}
+
+int isdigit(char c)
+{
+  if (c >= 48 && c <= 57)
+  {
+    return 0;
+  }
+  return -1;
 }

@@ -2,10 +2,11 @@
 #define ISR80H_H
 
 #include "io.h"
-#include "./heap.h"
+#include "heap.h"
 #include "process.h"
 
-enum systemcommands{
+enum systemcommands
+{
     SYSTEM_COMMAND1_PRINT,
     SYSTEM_COMMAND2_GETKEY,
     SYSTEM_COMMAND3_PUTCHAR,
