@@ -9,6 +9,7 @@
 #include "../string/string.h"
 #include "task.h"
 #include "../fs/file.h"
+#include "../loader/elfloader.h"
 
 typedef unsigned char PROCESS_FILETYPE;
 #define PROCESS_BINARY_FILE 1;
@@ -35,7 +36,12 @@ struct process_arguments
 struct process
 {
     int pid;
-    void *phy_addr;
+    union
+    {
+        void *phy_addr;
+        struct elf_file *elf_file;
+    };
+
     void *stack_phy_address;
     struct task *task;
     char filename[PATH_NAME_LIMIT];

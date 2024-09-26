@@ -154,7 +154,7 @@ void process_switch_to_any()
     {
         if (processes[i])
         {
-            process_switch(process[i]);
+            process_switch(processes[i]);
         }
     }
 }
@@ -172,7 +172,7 @@ int process_free_allocations(struct process *process)
 {
     for (int i = 0; i < NUMBER_OF_PROCESS_ALLOCATION; i++)
     {
-        process_free(process, process->allocations[i].ptr);
+        process_free(process, process->allocations[i].addr);
     }
     return 0;
 }
@@ -182,9 +182,29 @@ void process_free_binary_data(struct process *process)
     kfree(process->phy_addr);
 }
 
+int process_free_elf_data(struct process *process)
+{
+    elf_close(process->elf_file);
+    return 0;
+}
+
 void process_free_program_data(struct process *process)
 {
-    process_free_binary_data(process);
+    int res = 0;
+    switch (process->filetype)
+    {
+    case PROCESS_BINARY_FILE:
+        res = process_free_binary_data(process);
+        break;
+
+    case PROCESS_ELF_FILE:
+        res = process_free_elf_data(process);
+        break;
+
+    default:
+        res = -EINVARG;
+    }
+    return res;
 }
 
 int process_terminate(struct process *process)
@@ -202,9 +222,54 @@ int process_map_binary(struct process *process)
     return paging_map_to(process->task->chunk, process->phy_addr, (void *)PROGRAM_VIRTUAL_ADDRESS, paging_align_address(process->phy_addr + process->size), PAGING_IS_PREENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
 }
 
+static int process_map_elf(struct process *process)
+{
+    int res = 0;
+
+    struct elf_file *elf_file = process->elf_file;
+    struct elf_header *header = elf_header(elf_file);
+    struct elf32_phdr *phdrs = elf_pheader(header);
+    for (int i = 0; i < header->e_phnum; i++)
+    {
+        struct elf32_phdr *phdr = &phdrs[i];
+        void *phdr_phys_address = elf_phdr_phys_address(elf_file, phdr);
+        int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
+        if (phdr->p_flags & PF_W)
+        {
+            flags |= PAGING_IS_WRITABLE;
+        }
+        res = paging_map_to(process->task->chunk, paging_align_to_lower_page((void *)phdr->p_vaddr), paging_align_to_lower_page(phdr_phys_address), paging_align_address(phdr_phys_address + phdr->p_memsz), flags);
+        if (ISERR(res))
+        {
+            break;
+        }
+    }
+    return res;
+}
+
 int process_map_memory(struct process *process)
 {
-    return process_map_binary(process);
+    int res = 0;
+    if (process->filetype == PROCESS_ELF_FILE)
+    {
+        res = process_map_elf();
+    }
+    else if (process->filetype == PROCESS_BINARY_FILE)
+    {
+        process_map_binary(process);
+    }
+    else
+    {
+    }
+    if (res < 0)
+    {
+        goto out;
+    }
+
+    // Finally map the stack
+    paging_map_to(process->task->chunk, (void *)PROGRAM_VIRTUAL_STACK_ADDRESS_END, process->stack_phy_address, paging_align_address(process->stack_phy_address + USER_PROGRAM_STACK_SIZE), PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITABLE);
+out:
+    return res;
 }
 
 int process_load_binary(char *filename, struct process *process)
@@ -245,9 +310,31 @@ out:
     return res;
 }
 
+int process_load_elf_data(char *filename, struct process *process)
+{
+    struct elf_file *elf_file = 0;
+    int res = 0;
+    res = elf_load(filename, &elf_file);
+    if (res < 0)
+    {
+        goto out;
+    }
+    process->filetype = PROCESS_ELF_FILE;
+    process->elf_file = elf_file;
+
+out:
+    return res;
+}
+
 int process_load_data(char *filename, struct process *process)
 {
-    return process_load_binary_data(filename, process);
+    int res = 0;
+    res = process_load_binary_data(filename, process);
+    if (res < 0)
+    {
+        res = process_load_elf_data(filename, process);
+    }
+    return res;
 }
 
 int process_load_for_slot(char *filename, struct process **process, uint16_t process_slot)
@@ -327,5 +414,11 @@ out:
 
 int process_load_switch(char *filename, struct process **process)
 {
-    process_load(filename, process);
+    int res = process_load(filename, process);
+    if (res == 0)
+    {
+        process_switch(*process);
+    }
+
+    return res;
 }
