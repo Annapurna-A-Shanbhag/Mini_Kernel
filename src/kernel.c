@@ -93,7 +93,7 @@ void kernel_main()
 
     // Load the TSS
     tss_load(0x28);
-    struct paging_4gb_chunk *chunk = paging_new_4gb(PAGING_IS_PREENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
+    struct paging_4gb_chunk *chunk = paging_new_4gb(PAGING_IS_PRESENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
     paging_switch(chunk);
     // enable_paging();
     isr80h_register_commands();
