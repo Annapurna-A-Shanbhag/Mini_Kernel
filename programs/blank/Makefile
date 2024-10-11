@@ -4,8 +4,8 @@ FLAGS= -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-
 all: ${FILES}
 	i686-elf-gcc -g -T ./linker.ld -o ./blank.elf -ffreestanding -O0 -nostdlib -fpic -g ${FILES} ../stdlib/stdlib.elf
 
-./build/blank.o: ./blank.c
-	i686-elf-gcc ${INCLUDES} -I./ $(FLAGS) -std=gnu99 -c ./blank.c -o ./build/blank.o
+./build/blank.o: ./src/blank.c
+	i686-elf-gcc ${INCLUDES} -I./ $(FLAGS) -std=gnu99 -c ./src/blank.c -o ./build/blank.o
 
 clean:
 	rm -rf ${FILES}

@@ -3,11 +3,16 @@
 
 void gdt_encode(uint8_t * target,struct gdt_structure *source ){
 
-    target[0]=source->limit && 0xff;         //limit_first_byte
-    target[1]=(source->limit>>8)&& 0xff;     //limit_second_byte
-    target[2]=source->base && 0xff;          //base_first_byte
-    target[3]=(source->base>>8)&& 0xff;      //base_second_byte
-    target[4]=(source->base>>16)&& 0xff;     //base_third_byte
+
+    if ((source->limit > 65536) && ((source->limit & 0xFFF) != 0xFFF))
+    {
+        panic("encodeGdtEntry: Invalid argument\n");
+    }
+    target[0]=source->limit & 0xff;         //limit_first_byte
+    target[1]=(source->limit>>8)& 0xff;     //limit_second_byte
+    target[2]=source->base & 0xff;          //base_first_byte
+    target[3]=(source->base>>8)& 0xff;      //base_second_byte
+    target[4]=(source->base>>16)& 0xff;     //base_third_byte
     target[5]=source->type;                  //access_code;
     target[6] = 0x40; 
 
@@ -17,7 +22,7 @@ void gdt_encode(uint8_t * target,struct gdt_structure *source ){
     }
     
     target[6] |= (source->limit >> 16) & 0x0F; //flag
-    target[7]=(source->base>>16)&& 0xff;       //base_last_byte
+    target[7]=(source->base>>24)& 0xff;       //base_last_byte
 
 }
 

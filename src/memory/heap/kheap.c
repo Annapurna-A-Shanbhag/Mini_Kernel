@@ -45,4 +45,5 @@ int kfree(void *ptr)
     {
         print("Kfree has failed\n");
     }
+    return 0;
 }

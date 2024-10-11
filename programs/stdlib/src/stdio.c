@@ -4,7 +4,7 @@
 #include <stdarg.h>
 int putchar(int c)
 {
-    peachos_putchar((char)c);
+    system_putchar((char)c);
     return 0;
 }
 

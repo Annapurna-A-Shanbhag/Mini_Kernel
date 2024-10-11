@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "../config.h"
+#include "../kernel.h"
 
 struct gdt{
     uint16_t limit_first_word;
@@ -21,7 +22,7 @@ struct gdt_structure{
 
 };
 
-void gdt_encode(uint8_t * target,struct gdt_structure *source );
+//void gdt_encode(uint8_t * target,struct gdt_structure source );
 void gdt_initialize(struct gdt *gdt, struct gdt_structure *gdt_structure);
 void gdt_load(uint32_t size,struct gdt *gdt);
 

@@ -1,11 +1,9 @@
 #include "keyboard.h"
 
-struct keyboard keyboard;
-
 struct keyboard *keyboard_head_list;
 struct keyboard *keyboard_tail_list;
 
-void keyboard_insert(struct keyboard *keyboard)
+int keyboard_insert(struct keyboard *keyboard)
 {
     int res = 0;
     if (keyboard->init == 0)
@@ -70,7 +68,7 @@ void keyboard_push(char c)
 
 char keyboard_pop()
 {
-    if (!task_current())
+    if (!task_current_task())
     {
         return 0;
     }
@@ -89,8 +87,7 @@ char keyboard_pop()
     return c;
 }
 
-keyboard_initialization()
+void keyboard_initialization()
 {
-    memnset(&keyboard, 0x00, sizeof(keyboard));
     keyboard_insert(classic_init());
 }

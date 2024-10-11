@@ -1,11 +1,10 @@
-[BITS 32]
-
-segment .asm
+section .asm
 
 global idt_load
 global interrupt_pointer_table
 global isr80h_wrapper
 global no_interrupt
+global isr
 
 extern interrupt_handler
 extern isr80h_handler
@@ -14,15 +13,21 @@ extern no_interrupt_handler
 idt_load:
     push ebp
     mov ebp,esp
-    mov eax,[ebp+8];
-    lidt [eax]
+    mov ebx,[ebp+8];
+    lidt [ebx]
     pop ebp
     ret
+
+
 
 no_interrupt:
     pushad
     call no_interrupt_handler
     popad
+    iret
+
+isr:
+    call no_interrupt_handler
     iret
 
 isr80h_wrapper:
@@ -38,16 +43,12 @@ isr80h_wrapper:
      push esp
      push eax
      call isr80h_handler
-     mov dword[temp_res], eax
+     mov dword[tmp_res], eax
      add esp,8
      popad
      mov eax,[tmp_res]
-     iret
+     iretd
 
-
-section .data
-; Inside here is stored the return result from isr80h_handler
-tmp_res: dd 0
 
 %macro interrupt 1
     global int%1
@@ -68,14 +69,20 @@ tmp_res: dd 0
         add esp,8
         popad
         iret
-
 %endmacro
 
 %assign i 0
 %rep 512
     interrupt i
 %assign i i+1
+%endrep
 
+
+
+     
+section .data
+; Inside here is stored the return result from isr80h_handler
+tmp_res: dd 0
 
 %macro interrupt_array_entry 1
     dd int%1

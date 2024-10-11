@@ -1,9 +1,11 @@
 #ifndef ISR80H_H
 #define ISR80H_H
 
-#include "io.h"
-#include "heap.h"
-#include "process.h"
+#include "./io.h"
+#include "./heap.h"
+#include "./process.h"
+#include "../idt/idt.h"
+
 
 enum systemcommands
 {
@@ -13,8 +15,13 @@ enum systemcommands
     SYSTEM_COMMAND4_MALLOC,
     SYSTEM_COMMAND5_FREE,
     SYSTEM_COMMAND6_PROCESS_LOAD_START,
+    SYSTEM_COMMAND7_INVOKE_SYSTEM_COMMAND,
+    SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS,
+    SYSTEM_COMMAND9_EXIT
+
 };
 
 void isr80h_register_commands();
+
 
 #endif

@@ -3,6 +3,7 @@
 struct disk disk;
 
 void disk_search_and_init(){
+    memnset(&disk,0x00,sizeof(disk));
     disk.sector_size=SECTOR_SIZE;
     disk.type=DISK_TYPE_REAL;
     disk.id=0;

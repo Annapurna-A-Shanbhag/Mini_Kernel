@@ -120,13 +120,15 @@ int heap_mark_table_entries_as_free(struct heap *heap, int first_block)
     }
 
     int i = 0;
-    while ((addr[i] & HEAP_BLOCK_HAS_NEXT) != 0x0)
+    int index=i+first_block;
+     while ((addr[index] & HEAP_BLOCK_HAS_NEXT) != 0x0)
     {
-        addr[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
+        addr[index] = HEAP_BLOCK_TABLE_ENTRY_FREE;
         i++;
+        index++;
     }
-    addr[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
-    res = i;
+    addr[index] = HEAP_BLOCK_TABLE_ENTRY_FREE;
+    res = i+1;
 
 out:
     return res;
@@ -153,7 +155,7 @@ int heap_free(struct heap *heap, void *ptr)
 
     int start_block = heap_convert_address_to_blocks(heap, ptr);
     int blocks = heap_mark_table_entries_as_free(heap, start_block);
-    if (blocks <= 0)
+    if (blocks < 0)
     {
         res = -EINVARG;
         goto out;

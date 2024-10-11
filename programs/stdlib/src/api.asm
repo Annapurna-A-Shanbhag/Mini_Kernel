@@ -2,6 +2,17 @@
 
 section .asm
 
+global print:function
+global getkey:function
+global system_putchar:function
+global system_malloc:function
+global system_free:function
+global process_load_start:function
+global invoke_system_command:function
+global process_get_arguments:function
+global exit:function
+
+
 ; void print(char *str)
 print:
     push ebp
@@ -23,7 +34,7 @@ getkey:
     ret
 
 ;  void putchar(char c)
-putchar:
+system_putchar:
     push ebp
     mov ebp,esp
     push dword[ebp+8]
@@ -34,7 +45,7 @@ putchar:
     ret
 
 ; void malloc(size_t size)
-malloc:
+system_malloc:
     push ebp
     mov ebp,esp
     push dword[ebp+8]
@@ -45,7 +56,7 @@ malloc:
     ret
 
 ; void free(void * addr)
-free:
+system_free:
     push ebp
     mov ebp,esp
     push dword[ebp+8]
@@ -81,8 +92,8 @@ invoke_system_command:
 process_get_arguments:
     push ebp
     mov ebp, esp
-    mov eax, 8 
     push dword[ebp+8] 
+    mov eax, 8 
     int 0x80
     add esp, 4
     pop ebp

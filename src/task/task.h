@@ -3,6 +3,7 @@
 
 #include "./process.h"
 #include "../memory/paging/paging.h"
+#include "../idt/idt.h"
 
 struct interrupt_frame;
 struct registers
@@ -24,7 +25,7 @@ struct registers
 
 struct task
 {
-    struct proces *process;
+    struct process *process;
     struct registers registers;
     struct task *prev;
     struct task *next;
@@ -34,17 +35,22 @@ struct task
 struct process;
 
 void user_registers();
-struct task *new_task(struct process *process);
+int task_switch(struct task *task);
+struct task *task_new(struct process *process);
 int task_page();
 void *task_get_stack_item(struct task *task, int top);
 int copy_string_from_task(struct task *task, void *virt, void *phy, uint32_t size);
 struct task *task_current_task();
 void task_free(struct task *task);
-void task_save_state(struct task *task, struct interrupt_frame *frame);
+void task_current_save_state(struct interrupt_frame *frame);
 void task_next();
 void task_free(struct task *task);
 struct task *task_get_next();
 void task_page_task(struct task *task);
-int task_page();
+void task_return(struct registers* reg);
+void task_run_first_ever_task();
+void tasks(struct task *task);
+
+
 
 #endif

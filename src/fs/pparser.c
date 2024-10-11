@@ -4,12 +4,12 @@ int extract_file_or_directory(char *path, char *name, int index)
 {
     int i = index;
     int j = 0;
-    while (*(path + i) != '/' || *(path + i) != '\n')
+    while (*(path + i) != '/' && *(path + i) != '\0')
     {
-        i++;
         name[j++] = *(path + i);
+        i++;
     }
-    name[j++] = '\n';
+    name[j++] = '\0';
     return j;
 }
 
@@ -20,11 +20,11 @@ int path_parser_validate_format(char **path)
     {
         goto out;
     }
-    if (!(isdigit(*path[0])))
+    if ((isdigit(*path[0])))
     {
         goto out;
     }
-    if ((str_n_cmp(*path[1], ":/", 2)) < 0)
+    if ((str_n_cmp(*path+1, ":/", 2)) < 0)
     {
         goto out;
     }
@@ -69,29 +69,31 @@ int path_parser_parse_path_part(struct root_path *root, char *path)
             root->part = part;
         }
     }
+    return 0;
 }
 
 struct root_path *path_parser(char *file_path)
 {
     int res = 0;
-    struct root_path root;
+    struct root_path *root=kzalloc(sizeof(struct root_path));
+    
     res = path_parser_validate_format(&file_path);
     if (res < 0)
     {
         goto out;
     }
-    res = path_parser_create_root(file_path[0], &root);
+    res = path_parser_create_root(file_path[0], root);
     if (res < 0)
     {
         goto out;
     }
 
-    path_parser_parse_path_part(&root, file_path + 3);
+    res=path_parser_parse_path_part(root, file_path);
 
 out:
     if (res < 0)
     {
         return 0;
     }
-    return &root;
+    return root;
 }

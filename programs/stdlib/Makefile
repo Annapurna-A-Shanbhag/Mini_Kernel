@@ -9,16 +9,17 @@ all: ${FILES}
 	nasm -f elf ./src/start.asm -o ./build/start.asm.o
 
 ./build/api.asm.o: ./src/api.asm
-	nasm -f elf ./src/peachos.asm -o ./build/peachos.asm.o
+	nasm -f elf ./src/api.asm -o ./build/api.asm.o
 
 ./build/api.o: ./src/api.c
-	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/peachos.c -o ./build/peachos.o
+	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/api.c -o ./build/api.o
 
 ./build/stdlib.o: ./src/stdlib.c
 	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/stdlib.c -o ./build/stdlib.o
 
 ./build/stdio.o: ./src/stdio.c
 	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/stdio.c -o ./build/stdio.o
+
 
 ./build/string.o: ./src/string.c
 	i686-elf-gcc ${INCLUDES} $(FLAGS) -std=gnu99 -c ./src/string.c -o ./build/string.o

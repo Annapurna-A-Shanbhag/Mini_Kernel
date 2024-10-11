@@ -65,13 +65,7 @@ void task_free(struct task *task)
     paging_free_4gb_chunk(task->chunk);
     task_list_remove(task);
     kfree(task);
-}
-
-int task_switch(struct task *task)
-{
-    current_task = task;
-    paging_switch(task->chunk);
-    return 0;
+    
 }
 
 void task_next()
@@ -79,6 +73,7 @@ void task_next()
     struct task *next_task = task_get_next();
     if (!next_task)
     {
+        panic("No more tasks in the system to switch\n");
     }
 
     task_switch(next_task);
@@ -88,9 +83,9 @@ void task_next()
 void *task_get_stack_item(struct task *task, int top)
 {
     void *result = 0;
-    uint32_t *sp_ptr = task->registers.esp;
+    uint32_t *sp_ptr = (uint32_t*)task->registers.esp;
     task_page_task(task);
-    result = sp_ptr[top];
+    result = (void *)sp_ptr[top];
     kernel_page();
     return result;
 }
@@ -100,22 +95,21 @@ int copy_string_from_task(struct task *task, void *virt, void *phy, uint32_t siz
     int res = 0;
     if (size >= PAGE_SIZE)
     {
-        res - EINVARG;
+        res =-EINVARG;
         goto out;
     }
-    void *tmp = kzalloc(sizeof(size));
+    char *tmp = kzalloc(size);
     if (!tmp)
     {
-        res - ENOMEM;
+        res =-ENOMEM;
         goto out;
     }
-    int old_value = page_get(task->chunk, tmp);
+    int old_value = paging_get(task->chunk->directory_entry, tmp);
     if (old_value < 0)
     {
         goto out;
     }
-    task_page_task(task);
-    paging_map(task->chunk, tmp, tmp, size, PAGING_IS_PREENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
+    paging_map(task->chunk, tmp,tmp,PAGING_IS_PRESENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
     paging_switch(task->chunk);
     str_n_cpy(tmp, virt, size);
     kernel_page();
@@ -134,6 +128,7 @@ out:
         if (tmp)
         {
             kfree(tmp);
+            
         }
     }
     return res;
@@ -155,22 +150,36 @@ void task_save_state(struct task *task, struct interrupt_frame *frame)
     task->registers.esi = frame->esi;
 }
 
+void task_current_save_state(struct interrupt_frame *frame){
+    struct task *task=task_current_task();
+    if(!task){
+        panic("No current task to save\n");
+    }
+    task_save_state(task,frame);
+    
+}
+
 int task_initialization(struct task *task, struct process *process)
 {
-    task->chunk = paging_new_4gb(PAGING_IS_PREENT | PAGING_ACCESS_FROM_ALL); // Why not writable?
+    task->chunk = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL); // Why not writable?
     if (!task->chunk)
     {
         return -ENOMEM;
     }
     task->process = process;
     task->registers.ip = PROGRAM_VIRTUAL_ADDRESS;
+    if (process->filetype == PROCESS_ELF_FILE)
+    {
+        task->registers.ip = elf_header(process->elf_file)->e_entry;
+    }
+
     task->registers.esp = PROGRAM_STACK_VIRT_ADDRESS;
-    task->registers.cs = KERNEL_CODE_SEGMENT_SELECTOR;
-    task->registers.ss = KERNEL_DATA_SEGMENT_SELECTOR;
+    task->registers.cs = USER_CODE_SEGMENT_SELECTOR;
+    task->registers.ss = USER_DATA_SEGMENT_SELECTOR;
     return 0;
 }
 
-struct task *new_task(struct process *process)
+struct task *task_new(struct process *process)
 {
     struct task *task = kzalloc(sizeof(struct task));
     int res = 0;
@@ -195,11 +204,26 @@ struct task *new_task(struct process *process)
     task->prev = task_tail;
     task_tail = task;
 out:
-    if (res < 0)
+    if (ISERR(res))
     {
-        if (task)
+        if (task){
             kfree(task);
+            
+        }
         return ERROR(res);
     }
     return task;
+}
+
+
+void task_run_first_ever_task()
+{
+    if (!current_task)
+    {
+        panic("task_run_first_ever_task(): No current task exists!\n");
+    }
+
+    task_switch(task_head);
+    task_return(&task_head->registers);
+    //tasks(process->task);
 }

@@ -15,6 +15,8 @@
 #include "./fs/file.h"
 #include "./isr80h/isr80h.h"
 #include "./keyboard/keyboard.h"
+#include "./task/process.h"
+
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
@@ -25,6 +27,9 @@
 
 void kernel_main();
 void print(char *str);
-void kerenl_registers();
-
+void kernel_registers();
+void kernel_page();
+void terminal_writechar(char c, char colour);
+void panic(char *str);
+void print_c(char *str1,int c);
 #endif

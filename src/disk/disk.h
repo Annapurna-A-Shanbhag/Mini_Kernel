@@ -5,6 +5,7 @@
 #include"../config.h"
 #include "../io/io.h"
 
+
 typedef unsigned int DISK_TYPE;
 
 #define DISK_TYPE_REAL 0;
@@ -14,7 +15,7 @@ struct disk{
     int id;
     struct filesystem *f_system;
     DISK_TYPE type;
-    void* fs_private;
+    void * fs_private;
     int sector_size;
 
 };

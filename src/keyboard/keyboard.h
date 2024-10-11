@@ -6,6 +6,7 @@
 #include "../kernel.h"
 #include "../task/process.h"
 #include "../task/task.h"
+#include "./classic.h"
 
 #define KEYBOARD_CAPS_LOCK_ON 1
 #define KEYBOARD_CAPS_LOCK_OFF 0
@@ -22,6 +23,7 @@ struct keyboard
     struct keyboard *next;
 };
 
+struct process;
 void keyboard_initialization();
 void keyboard_backspace(struct process *process);
 void keyboard_push(char c);

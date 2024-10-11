@@ -2,8 +2,9 @@
 
 extern int main(int argc, char **argv);
 
-void c_start()
+void c_main()
 {
+    
     struct process_arguments arguments;
     process_get_arguments(&arguments);
 

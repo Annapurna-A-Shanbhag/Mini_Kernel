@@ -17,14 +17,17 @@ uint8_t keyboard_scan_set_one[] = {
     '6', '+', '1', '2', '3', '0', '.'};
 
 struct keyboard classic = {
-    .init = classic_keyboard_init};
+    .name={"Classic"},
+    .init = classic_keyboard_init
+};
 
 struct keyboard *classic_init()
 {
-    str_n_cpy(classic.name, "Classic", sizeof(classic.name));
+
     return &classic;
 }
 
+void classic_keyboard_handle_interrupt();
 int classic_keyboard_init()
 {
     idt_register_interrupt_callback(ISR_KEYBOARD_INTERRUPT, classic_keyboard_handle_interrupt);
@@ -78,5 +81,5 @@ void classic_keyboard_handle_interrupt()
         keyboard_push(c);
     }
 
-    task_page_task();
+    task_page();
 }

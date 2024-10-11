@@ -1,7 +1,11 @@
+[BITS 32]
+
 section .asm
 
-global user_registrers
-
+global restore_general_purpose_registers
+global user_registers
+global task_return
+global tasks
 
 ; void task_return(struct registers* regs);
 task_return:
@@ -44,6 +48,7 @@ task_return:
 
     ; Let's leave kernel land and execute in user land!
     iretd
+
     
 ; void restore_general_purpose_registers(struct registers* regs);
 restore_general_purpose_registers:
@@ -57,14 +62,22 @@ restore_general_purpose_registers:
     mov ecx, [ebx+20]
     mov eax, [ebx+24]
     mov ebx, [ebx+12]
+    
     add esp, 4
     ret
 
 
-user_registrers:
+user_registers:
     mov ax, 0x23
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
+    ret
+
+tasks:
+    mov eax,0
+    mov ebx,0
+    mov ecx,0
+    mov edx,0
     ret

@@ -1,11 +1,11 @@
 [BITS 32]
 
-section .asm
-
 global _start
 
 extern c_main
 extern exit
+
+section .asm
 
 _start:
     call c_main

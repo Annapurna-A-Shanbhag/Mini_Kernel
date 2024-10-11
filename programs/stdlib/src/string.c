@@ -4,7 +4,7 @@ int str_len(char *str)
 { // We can simplify this
     int i = 0;
     char c = *(str + i);
-    while (c != '\n')
+    while (c != '\0')
     {
         i++;
         c = *(str + i);
@@ -17,8 +17,11 @@ void str_n_cpy(char *dest, char *src, size_t n)
     for (int i = 0; i < n; i++)
     {
         *(dest + i) = *(src + i);
+         if(src[i]=='\0')
+           return;
     }
-    dest[n] = '\n';
+   
+    dest[n] = '\0';
 }
 
 int str_n_cmp(char *str1, char *str2, size_t n)
@@ -43,10 +46,10 @@ int isdigit(char c)
 }
 
 char *sp = 0;
-char *strtok(char *str, const char *delimiters)
+char *strtok(char *str, char *delimiters)
 {
     int i = 0;
-    int len = strlen(delimiters);
+    int len = str_len(delimiters);
     if (!str && !sp)
         return 0;
 

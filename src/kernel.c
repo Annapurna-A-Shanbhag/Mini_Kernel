@@ -53,6 +53,23 @@ void print(char *str)
     }
 }
 
+void print_c(char *str1,int c){
+    int i=0;
+    char str2[PATH_LIMIT];
+    while(str1[i]!='\0'){
+        str2[i]=str1[i];
+        i++;
+    }
+    str2[i]=c+65;
+    str2[i+1]='\0';
+    print(str2);
+}
+
+void panic(char *str){
+    print(str);
+    while(1){}
+}
+
 struct tss tss;
 struct gdt gdt[GDT_TOTAL_ENTRIES];
 struct gdt_structure gdt_structure[GDT_TOTAL_ENTRIES] = {
@@ -76,26 +93,64 @@ void kernel_main()
 {
 
     terminal_initialize();
-    print("HELLO WORLD\n");
+    //print("HELLO WORLD\n");
+    
     memnset(gdt, 0, sizeof(gdt));
+    
     gdt_initialize(gdt, gdt_structure);
+   
+    
     gdt_load(sizeof(gdt), gdt);
+    
 
-    idt_initialization();
     kheap_initialization();
 
     fs_initialization();
+    //fs_init();
     disk_search_and_init();
 
-    memset(&tss, 0x00, sizeof(tss));
+    
+    idt_initialization();
+
+    memnset(&tss, 0x00, sizeof(tss));
     tss.esp0 = 0x600000;
     tss.ss0 = KERNEL_DATA_SEGMENT_SELECTOR;
 
-    // Load the TSS
+    //Load the TSS
     tss_load(0x28);
-    struct paging_4gb_chunk *chunk = paging_new_4gb(PAGING_IS_PRESENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
-    paging_switch(chunk);
-    // enable_paging();
+
+    kernel_chunk = paging_new_4gb(PAGING_IS_PRESENT | PAGING_IS_WRITABLE | PAGING_ACCESS_FROM_ALL);
+
+    paging_switch(kernel_chunk);
+    enable_paging(); 
+
     isr80h_register_commands();
+
     keyboard_initialization();
+    
+
+   struct process *process;
+    int res=process_load_switch("0:/shell.elf",&process);
+    if(res<0){
+        panic("Process isn't loaded\n");
+    }
+    struct command_arguments argument;
+    str_n_cpy(argument.argument,"ABC!",4);
+    argument.next=0;
+    process_inject_arguments(process,&argument); 
+
+    
+
+    /*res=process_load_switch("0:/blank.elf",&process);
+    if(res<0){
+        panic("Process isn't loaded\n");
+    }
+    str_n_cpy(argument.argument,"XYZ!",4);
+    argument.next=0;
+    process_inject_arguments(process,&argument); */
+
+    task_run_first_ever_task();
+    while(1){} 
+
+
 }

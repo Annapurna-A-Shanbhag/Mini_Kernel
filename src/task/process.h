@@ -10,10 +10,13 @@
 #include "task.h"
 #include "../fs/file.h"
 #include "../loader/elfloader.h"
+#include "../kernel.h"
+
+
+#define PROCESS_BINARY_FILE 1
+#define PROCESS_ELF_FILE 0
 
 typedef unsigned char PROCESS_FILETYPE;
-#define PROCESS_BINARY_FILE 1;
-#define PROCESS_ELF_FILE 0;
 
 struct process_allocation
 {
@@ -24,7 +27,7 @@ struct process_allocation
 struct command_arguments
 {
     char argument[512];
-    struct current_arguments *next;
+    struct command_arguments *next;
 };
 
 struct process_arguments
@@ -49,7 +52,7 @@ struct process
     uint32_t size;
     struct process_allocation allocations[NUMBER_OF_PROCESS_ALLOCATION];
     struct process_arguments arguments;
-    struct keyboard
+    struct keyboard_buffer
     {
         char buffer[KEYBOARD_BUFFER_SIZE];
         int tail;
@@ -57,10 +60,12 @@ struct process
     } keyboard;
 };
 
-int process_malloc(struct process *process, size_t size);
+void* process_malloc(struct process *process, size_t size);
 int process_load_switch(char *filename, struct process **process);
 int process_free(struct process *process, void *ptr);
 void process_get_arguments(struct process *process, int *argc, char ***argv);
 int process_terminate(struct process *process);
+struct process * process_current();
+int process_inject_arguments(struct process *process, struct command_arguments *root_argument);
 
 #endif

@@ -31,7 +31,6 @@ int new_descriptor(struct filesystem_desc **desc)
         res = -ENOMEM;
         goto out;
     }
-    res = -ENOMEM;
     for (int i = 0; i < NUMBER_OF_FILE_DESCRIPTORS; i++)
     {
         if (filesystem_descs[i] == 0x00)
@@ -48,7 +47,7 @@ out:
 
 struct filesystem_desc *fs_get_fs_descriptor(int fd)
 {
-    if (fd < 0 || fd > NUMBER_OF_FILE_DESCRIPTORS)
+    if (fd <= 0 || fd > NUMBER_OF_FILE_DESCRIPTORS)
     {
         return 0;
     }
@@ -85,6 +84,7 @@ void fs_insert_filesystem(struct filesystem *f_system)
 
 void fs_initialization()
 {
+    
     memnset(filesystems, 0, sizeof(filesystems));
     fs_descriptor_initialization(filesystem_descs);
     struct filesystem *f_16 = fat16_initialization();
@@ -137,9 +137,15 @@ int fopen(char *file_name, char *str_mode)
         goto out;
     }
     void *descriptor_private = disk->f_system->open(disk, root, mode);
+    
+    if(ISERR(descriptor_private)){
+        res=ERROR_I(descriptor_private);
+        goto out;
+
+    }
     struct filesystem_desc *desc;
     int response = new_descriptor(&desc);
-    if (!response)
+    if (response<0)
     {
         res = response;
         goto out;
@@ -147,6 +153,7 @@ int fopen(char *file_name, char *str_mode)
     desc->disk = disk;
     desc->file = disk->f_system;
     desc->private = descriptor_private;
+    filesystem_descs[desc->index-1]=desc;
     res = desc->index;
 
 out:

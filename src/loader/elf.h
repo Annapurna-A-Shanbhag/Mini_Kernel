@@ -106,12 +106,12 @@ struct elf_header
 struct elf32_dyn
 {
     elf32_sword d_tag;
-    union
+    union 
     {
         elf32_word d_val;
         elf32_addr d_ptr;
     } d_un;
-
+    
 } __attribute__((packed));
 
 struct elf32_sym
@@ -124,7 +124,7 @@ struct elf32_sym
     elf32_half st_shndx;
 } __attribute__((packed));
 
-void *elf_get_entry_ptr(struct elf_header *elf_header);
-uint32_t elf_get_entry(struct elf_header *elf_header);
+void* elf_get_entry_ptr(struct elf_header* elf_header);
+uint32_t elf_get_entry(struct elf_header* elf_header);
 
 #endif

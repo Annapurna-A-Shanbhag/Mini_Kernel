@@ -2,9 +2,9 @@
 #define API_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <stdbool.h>
 
-#include "../../../src/task/process.h"
 
 struct command_argument
 {
@@ -19,16 +19,16 @@ struct process_arguments
 };
 
 void print(char *str);
-int get_key();
-void putchar(char c);
-void malloc(size_t size);
-void free(void *addr);
+int getkey();
+void system_putchar(char c);
+void* system_malloc(size_t size);
+void system_free(void *addr);
 void process_load_start(char *filename);
 int invoke_system_command(struct command_argument *argument);
 void process_get_arguments(struct process_arguments *arguments);
 void exit();
-int peachos_getkeyblock();
-void peachos_terminal_readline(char *out, int max, bool output_while_typing);
-void peachos_process_load_start(const char *filename);
-
+int getkeyblock();
+void terminal_readline(char *out, int max, bool output_while_typing);
+int system_run(char *command);
+struct command_argument *parse_command(char *command, int max);
 #endif
