@@ -31,4 +31,12 @@ int getkeyblock();
 void terminal_readline(char *out, int max, bool output_while_typing);
 int system_run(char *command);
 struct command_argument *parse_command(char *command, int max);
+int shmget(uint16_t shmkey,size_t size,uint8_t flags);
+void* shmat(uint16_t shmid);
+int shmdt(void *virt_addr);
+int shmdestroy(void *virt_addr);
+int acquire_lock(int lock_type,int shm_id);
+int release_lock(int lock_type,int shm_id);
+
+
 #endif

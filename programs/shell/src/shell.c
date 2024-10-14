@@ -13,7 +13,7 @@ int main(int argc, char **argv)
         print("\n");
         system_run(buf);
 
-        print("\n");
+        print("\n"); 
     }
     return 0;
 }

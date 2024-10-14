@@ -2,7 +2,8 @@
     "files.associations": {
         "stdint.h": "c",
         "memory.h": "c",
-        "status.h": "c"
+        "status.h": "c",
+        "paging.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

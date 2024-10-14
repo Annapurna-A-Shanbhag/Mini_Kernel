@@ -5,6 +5,8 @@
 #include "./heap.h"
 #include "./process.h"
 #include "../idt/idt.h"
+#include "./shrdmem.h"
+#include "./lock.h"
 
 
 enum systemcommands
@@ -17,7 +19,13 @@ enum systemcommands
     SYSTEM_COMMAND6_PROCESS_LOAD_START,
     SYSTEM_COMMAND7_INVOKE_SYSTEM_COMMAND,
     SYSTEM_COMMAND8_GET_PROGRAM_ARGUMENTS,
-    SYSTEM_COMMAND9_EXIT
+    SYSTEM_COMMAND9_EXIT,
+    SYSTEM_COMMAND10_SHMGET,
+    SYSTEM_COMMAND11_SHMAT,
+    SYSTEM_COMMAND12_SHMDT,
+    SYSTEM_COMMAND13_SHMDESTROY,
+    SYSTEM_COMMAND14_ACQUIRE_LOCK,
+    SYSTEM_COMMAND15_RELEASE_LOCK
 
 };
 

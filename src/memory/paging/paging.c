@@ -34,7 +34,7 @@ void paging_free_4gb_chunk(struct paging_4gb_chunk *chunk)
     for (int i = 0; i < PAGE_DIRECTORY_ENTRIES; i++)
     {
         uint32_t entry = directory[i];
-        uint32_t *table = (uint32_t *)(entry | 0xfffff000);
+        uint32_t *table = (uint32_t *)(entry & 0xfffff000);
         kfree(table);
     }
     kfree(directory);

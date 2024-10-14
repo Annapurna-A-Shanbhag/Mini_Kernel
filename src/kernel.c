@@ -106,10 +106,9 @@ void kernel_main()
     kheap_initialization();
 
     fs_initialization();
-    //fs_init();
+
     disk_search_and_init();
 
-    
     idt_initialization();
 
     memnset(&tss, 0x00, sizeof(tss));
@@ -130,7 +129,7 @@ void kernel_main()
     
 
    struct process *process;
-    int res=process_load_switch("0:/shell.elf",&process);
+    int res=process_load_switch("0:/client.elf",&process);
     if(res<0){
         panic("Process isn't loaded\n");
     }
@@ -141,13 +140,13 @@ void kernel_main()
 
     
 
-    /*res=process_load_switch("0:/blank.elf",&process);
+    res=process_load_switch("0:/server.elf",&process);
     if(res<0){
         panic("Process isn't loaded\n");
     }
     str_n_cpy(argument.argument,"XYZ!",4);
     argument.next=0;
-    process_inject_arguments(process,&argument); */
+    process_inject_arguments(process,&argument);  
 
     task_run_first_ever_task();
     while(1){} 

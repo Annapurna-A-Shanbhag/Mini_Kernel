@@ -42,7 +42,9 @@ isr80h_wrapper:
      pushad
      push esp
      push eax
+     ;sti
      call isr80h_handler
+     ;cli
      mov dword[tmp_res], eax
      add esp,8
      popad

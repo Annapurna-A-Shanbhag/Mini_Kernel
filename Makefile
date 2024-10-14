@@ -1,4 +1,4 @@
-FILES= ./build/kernel.asm.o ./build/kernel.o ./build/gdt/gdt.asm.o ./build/gdt/gdt.o ./build/memory/memory.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/string/string.o ./build/io/io.asm.o ./build/memory/paging/paging.asm.o ./build/memory/paging/paging.o ./build/fs/pparser.o ./build/disk/disk.o ./build/disk/streamer.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/task/process.o ./build/task/task.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/isr80h/isr80h.o ./build/isr80h/io.o ./build/isr80h/heap.o ./build/isr80h/process.o ./build/loader/elf.o ./build/loader/elfloader.o ./build/idt/idt.asm.o ./build/idt/idt.o
+FILES= ./build/kernel.asm.o ./build/kernel.o ./build/gdt/gdt.asm.o ./build/gdt/gdt.o ./build/memory/memory.o ./build/memory/heap/heap.o ./build/memory/heap/kheap.o ./build/string/string.o ./build/io/io.asm.o ./build/memory/paging/paging.asm.o ./build/memory/paging/paging.o ./build/fs/pparser.o ./build/disk/disk.o ./build/disk/streamer.o ./build/fs/file.o ./build/fs/fat/fat16.o ./build/task/process.o ./build/task/task.o ./build/task/task.asm.o ./build/task/tss.asm.o ./build/keyboard/keyboard.o ./build/keyboard/classic.o ./build/isr80h/isr80h.o ./build/isr80h/io.o ./build/isr80h/heap.o ./build/isr80h/process.o ./build/isr80h/shrdmem.o ./build/isr80h/lock.o ./build/loader/elf.o ./build/loader/elfloader.o ./build/idt/idt.asm.o ./build/idt/idt.o ./build/ipc/sharedmem.o ./build/locks/lock.o
 INCLUDES = -I./src
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
@@ -13,6 +13,8 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	sudo cp ./programs/blank/blank.elf /mnt/
 	sudo cp ./programs/shell/shell.elf /mnt/
 	sudo cp ./programs/test/test.bin /mnt/
+	sudo cp ./programs/ipc_programs/client.elf /mnt/
+	sudo cp ./programs/ipc_programs/server.elf /mnt/
 
 	sudo umount /mnt
 
@@ -102,6 +104,12 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/isr80h/io.o: ./src/isr80h/io.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/io.c -o ./build/isr80h/io.o
 
+./build/isr80h/shrdmem.o: ./src/isr80h/shrdmem.c
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/shrdmem.c -o ./build/isr80h/shrdmem.o
+
+./build/isr80h/lock.o: ./src/isr80h/lock.c
+	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/lock.c -o ./build/isr80h/lock.o
+
 ./build/isr80h/heap.o: ./src/isr80h/heap.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/isr80h/heap.c -o ./build/isr80h/heap.o
 
@@ -114,18 +122,27 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 ./build/loader/elfloader.o: ./src/loader/elfloader.c
 	i686-elf-gcc $(INCLUDES) -I./src/isr80h $(FLAGS) -std=gnu99 -c ./src/loader/elfloader.c -o ./build/loader/elfloader.o
 
+./build/ipc/sharedmem.o: ./src/ipc/sharedmem.c
+	i686-elf-gcc $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/ipc/sharedmem.c -o ./build/ipc/sharedmem.o
+
+./build/locks/lock.o: ./src/locks/lock.c
+	i686-elf-gcc $(INCLUDES) -I./src/fs $(FLAGS) -std=gnu99 -c ./src/locks/lock.c -o ./build/locks/lock.o
+
 
 user_programs:
 	cd ./programs/stdlib && $(MAKE) all
 	cd ./programs/blank && $(MAKE) all
 	cd ./programs/shell && $(MAKE) all
 	cd ./programs/test && $(MAKE) all
+	cd ./programs/ipc_programs && $(MAKE) all
 
 user_programs_clean:
 	cd ./programs/stdlib && $(MAKE) clean
 	cd ./programs/blank && $(MAKE) clean
 	cd ./programs/shell && $(MAKE) clean
-	cd ./programs/test && $(MAKE) all
+	cd ./programs/test && $(MAKE) clean
+	cd ./programs/ipc_programs && $(MAKE) clean
+
 
 
 clean: user_programs_clean

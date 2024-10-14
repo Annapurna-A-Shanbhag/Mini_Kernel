@@ -34,7 +34,6 @@ void interrupt_handler(int interrupt, struct interrupt_frame *frame)
     {
         task_current_save_state(frame);
         
-        //terminal_writechar(interrupt+97,15);
         //print_c("caught ",interrupt);
         interrupt_callbacks[interrupt](frame);
     }
