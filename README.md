@@ -1,32 +1,46 @@
-1.	Mini Kernel is a basic kernel that resembles Linux in its functionality. This personal project was done to understand the inner working of various features of Linux Kernel and their interoperability with each other.
-2.	The features supported by Mini Kernel are:
-•	Booting the Kernel from hard disk
-•	Process management
-•	Dynamic memory
-•	Paging
-•	Filesystem -FAT16
-•	Interrupt management- Keyboard, Exceptions
-•	System calls
-•	Context switches
-•	Multi-processing
-•	Inter Process communication using shared memory
-•	Synchronization using mutex locks
-3.	Languages used: 
-•	C
-•	Assembly
-•	Shell script
-•	GNU Make
-4.	Tools:
-•	Qemu
-•	GDB
-5.	The procedure to configure the project
-•	Install Qemu (Well tested on Linux)
-•	Create a GCC Cross compiler on the system ://wiki.osdev.org/GCC_Cross-Compiler
-•	Open command prompt and run the below commands. 
-               Note: Make sure you are on the right path.
-o	cd Mini_Kernel 
-o	chmod +x build.sh
-o	./build.sh
-o	qemu-system-i386 -hda  ./bin/os.bin
+# Mini Kernel From Scratch!
+
+Mini Kernel is a working multi-processing kernel that mimics Linux functionality, developed as a personal project to gain a deeper understanding of Linux kernel internals and how various components work together.
+
+## Features
+
+Mini Kernel supports the following features:
+- **Booting**: Kernel booting from the hard disk
+- **Process Management**
+- **Dynamic Memory Management**
+- **Paging**
+- **Filesystem**: FAT16 support
+- **Interrupt Management**: Keyboard interrupts, exceptions handling
+- **System Calls**
+- **Context Switching**
+- **Multi-processing**
+- **ELF-Loader**: C program execution
+- **Inter-process Communication (IPC)**: Shared memory implementation
+- **Synchronization**: Mutex locks for process synchronization
+  
+
+## Languages Used
+- **C**
+- **Assembly**
+- **Shell Script**
+- **GNU Make**
+
+## Tools
+- **Qemu**
+- **GDB**
+
+## Project Setup
+
+Follow these steps to configure and run Mini Kernel:
+
+1. **Install Qemu** (Tested on Linux).
+2. **Create a GCC Cross Compiler**. Follow instructions at: [GCC Cross Compiler Setup](https://wiki.osdev.org/GCC_Cross-Compiler).
+3. **Run the commands below** from the terminal, ensuring you're in the correct directory.
+
+   ```bash
+   cd Mini_Kernel
+   chmod +x build.sh
+   ./build.sh
+   qemu-system-i386 -hda ./bin/os.bin
 
 
